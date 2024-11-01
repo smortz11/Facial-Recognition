@@ -1,10 +1,12 @@
 import face_recognition
 import cv2
 import numpy as np
-from picamera2 import Picamera2
 import time
 import pickle
-from gpiozero import LED
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+#from gpiozero import LED
 
 # Load pre-trained face encodings
 print("[INFO] loading encodings...")
@@ -14,12 +16,10 @@ known_face_encodings = data["encodings"]
 known_face_names = data["names"]
 
 # Initialize the camera
-picam2 = Picamera2()
-picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (1920, 1080)}))
-picam2.start()
+cam = cv2.VideoCapture(0)
 
 # Initialize GPIO
-output = LED(14)
+#output = LED(14)
 
 # Initialize our variables
 cv_scaler = 4 # this has to be a whole number
@@ -32,7 +32,7 @@ start_time = time.time()
 fps = 0
 
 # List of names that will trigger the GPIO pin
-authorized_names = ["john", "alice", "bob"]  # Replace with names you wish to authorise THIS IS CASE-SENSITIVE
+authorized_names = ["Andrew"]  # Replace with names you wish to authorise THIS IS CASE-SENSITIVE
 
 def process_frame(frame):
     global face_locations, face_encodings, face_names
@@ -67,11 +67,34 @@ def process_frame(frame):
     
     # Control the GPIO pin based on face detection
     if authorized_face_detected:
-        output.on()  # Turn on Pin
-    else:
-        output.off()  # Turn off Pin
+        send_email('yourboiandrew@gmail.com', '', 'jaychandirimani2003@gmail.com')
+        #output.on()  # Turn on Pin
+    #else:
+        #output.off()  # Turn off Pin
+        #continue
     
     return frame
+
+def send_email(sender_email, sender_password, recipient_email):
+    subject = "Face Detected!"
+    body = "A face has been detected by your facial recognition system."
+
+    # Create a multipart message
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        # Connect to the Gmail SMTP server
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()  # Upgrade to a secure connection
+            server.login(sender_email, sender_password)  # Log in to your email account
+            server.sendmail(sender_email, recipient_email, msg.as_string())  # Send the email
+            print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
 
 def draw_results(frame):
     # Display the results
@@ -108,7 +131,7 @@ def calculate_fps():
 
 while True:
     # Capture a frame from camera
-    frame = picam2.capture_array()
+    ret, frame = cam.read()
     
     # Process the frame with the function
     processed_frame = process_frame(frame)
@@ -131,6 +154,6 @@ while True:
         break
 
 # By breaking the loop we run this code here which closes everything
+cam.release()
 cv2.destroyAllWindows()
-picam2.stop()
-output.off()  # Make sure to turn off the GPIO pin when exiting
+#output.off()  # Make sure to turn off the GPIO pin when exiting
