@@ -3,9 +3,7 @@ import cv2
 import numpy as np
 import time
 import pickle
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import pyotp
 #from gpiozero import LED
 
 # Load pre-trained face encodings
@@ -14,6 +12,8 @@ with open("encodings.pickle", "rb") as f:
     data = pickle.loads(f.read())
 known_face_encodings = data["encodings"]
 known_face_names = data["names"]
+secret_key = "OILKYMRCXNK7NHD32TXMDIH6CCWGDMNS"
+totp = pyotp.TOTP(secret_key)
 
 # Initialize the camera
 cam = cv2.VideoCapture(0)
@@ -67,7 +67,13 @@ def process_frame(frame):
     
     # Control the GPIO pin based on face detection
     if authorized_face_detected:
-        send_email('yourboiandrew@gmail.com', '', 'jaychandirimani2003@gmail.com')
+        user_2fa_input = input("Enter 2FA key generated on your device: ")
+        if (user_2fa_input == totp.now()):
+            print("success")
+            exit()
+        else:
+            print("invalid 2fa key")
+            exit()
         #output.on()  # Turn on Pin
     #else:
         #output.off()  # Turn off Pin
@@ -75,26 +81,6 @@ def process_frame(frame):
     
     return frame
 
-def send_email(sender_email, sender_password, recipient_email):
-    subject = "Face Detected!"
-    body = "A face has been detected by your facial recognition system."
-
-    # Create a multipart message
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = recipient_email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
-
-    try:
-        # Connect to the Gmail SMTP server
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
-            server.starttls()  # Upgrade to a secure connection
-            server.login(sender_email, sender_password)  # Log in to your email account
-            server.sendmail(sender_email, recipient_email, msg.as_string())  # Send the email
-            print("Email sent successfully!")
-    except Exception as e:
-        print(f"Failed to send email: {e}")
 
 def draw_results(frame):
     # Display the results
