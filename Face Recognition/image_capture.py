@@ -66,7 +66,6 @@ def capture_photos(name):
         con = sqlite3.connect("Blackout.db")
         cur = con.cursor()
         secret_key = pyotp.random_base32()
-        print(f"Secret Key: {secret_key}")
 
         # Use parameterized queries to insert the data
         cur.execute("INSERT INTO users (name, secret_key) VALUES (?, ?)", (name, secret_key))
