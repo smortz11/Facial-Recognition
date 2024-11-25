@@ -52,10 +52,9 @@ def check_user_otp(name, otp):
         secret_key = result[0]  # Access the first column of the result
         totp = pyotp.TOTP(secret_key)
         if (otp == totp.now()):
-            print("yayy")
+            return True
         else:
-            print("invalid 2fa key")
-            exit()
+            return False
     else:
         print("Name not found in the database.")
 
