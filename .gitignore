@@ -1,8 +1,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,database
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,database
 
-dataset
-OTP
+dataset/
+OTP/
 
 ### Database ###
 *.accdb

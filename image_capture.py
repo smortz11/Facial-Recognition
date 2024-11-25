@@ -66,21 +66,19 @@ def capture_photos(name):
     else:
         con = sqlite3.connect("Blackout.db")
         cur = con.cursor()
-        secret_key = pyotp.random_base32()
-
-        email = input("Please enter your email address: ")
-
-        url_qr = pyotp.totp.TOTP(secret_key).provisioning_uri(email, issuer_name="Facial Recognition")
 
         otp_folder = create_folder("OTP", name)
         person_qr = os.path.join(otp_folder, "OTP.svg")
+
         if not os.path.exists(person_qr):
+            secret_key = pyotp.random_base32()
+
+            email = input("Please enter your email address: ")
+
+            url_qr = pyotp.totp.TOTP(secret_key).provisioning_uri(email, issuer_name="Facial Recognition")
             url = pyqrcode.create(url_qr)
+            url.svg(person_qr, scale=8)
 
-        # saves .svg image to working directory
-        # dont uncomment, just use screenshot in the directory
-
-        url.svg(person_qr, scale=8)
 
         # Use parameterized queries to insert the data
         cur.execute("INSERT INTO users (name, secret_key) VALUES (?, ?)", (name, secret_key))
