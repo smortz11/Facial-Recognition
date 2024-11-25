@@ -4,10 +4,6 @@ from datetime import datetime
 import sqlite3
 import pyotp
 import pyqrcode
-import model_training
-
-# Change this to the name of the person you're photographing
-PERSON_NAME = input("Please enter the name of the user you would like to add: ")
 
 def create_folder(folder, name):
 
@@ -90,7 +86,3 @@ def capture_photos(name):
     cam.release()
     cv2.destroyAllWindows()
     print(f"Photo capture completed. {photo_count} photos saved for {name}.")
-
-if __name__ == "__main__":
-    capture_photos(PERSON_NAME)
-    model_training.train_model()

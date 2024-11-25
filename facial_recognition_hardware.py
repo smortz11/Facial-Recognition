@@ -6,13 +6,6 @@ import pickle
 import pyotp
 import sqlite3
 
-con = sqlite3.connect("Blackout.db")
-cur = con.cursor()
-
-def close_connection():
-    cur.close()
-    con.close()
-
 # from gpiozero import LED
 
 # Load pre-trained face encodings
@@ -22,6 +15,7 @@ with open("encodings.pickle", "rb") as f:
 known_face_encodings = data["encodings"]
 known_face_names = data["names"]
 secret_key = ""
+authorized_face_detected = False
 
 # Initialize the camera
 cam = cv2.VideoCapture(0)
@@ -39,13 +33,40 @@ frame_count = 0
 start_time = time.time()
 fps = 0
 
+con = sqlite3.connect("Blackout.db")
+cur = con.cursor()
+
 # List of names that will trigger the GPIO pin
 cur.execute("SELECT name FROM users")
 authorized_names = [row[0] for row in cur.fetchall()]  # Replace with names you wish to authorise THIS IS CASE-SENSITIVE
 
+def close_connection():
+    cur.close()
+    con.close()
+
+def check_user_otp(name, otp):
+    cur.execute("SELECT secret_key FROM users WHERE name=?", (name,))
+    result = cur.fetchone()  # Fetch the first matching row
+
+    if result:
+        secret_key = result[0]  # Access the first column of the result
+        totp = pyotp.TOTP(secret_key)
+        if (otp == totp.now()):
+            print("yayy")
+        else:
+            print("invalid 2fa key")
+            exit()
+    else:
+        print("Name not found in the database.")
+
+    close_connection()
+    # output.on()  # Turn on Pin
+# else:
+# output.off()  # Turn off Pin
+# continue
 
 def process_frame(frame):
-    global face_locations, face_encodings, face_names
+    global face_locations, face_encodings, face_names, authorized_face_detected
 
     # Resize the frame using cv_scaler to increase performance (less pixels processed, less time spent)
     resized_frame = cv2.resize(frame, (0, 0), fx=(1 / cv_scaler), fy=(1 / cv_scaler))
@@ -58,7 +79,7 @@ def process_frame(frame):
     face_encodings = face_recognition.face_encodings(rgb_resized_frame, face_locations, model='large')
 
     face_names = []
-    authorized_face_detected = False
+    name = ""
 
     for face_encoding in face_encodings:
         # See if the face is a match for the known face(s)
@@ -75,29 +96,7 @@ def process_frame(frame):
                 authorized_face_detected = True
         face_names.append(name)
 
-    # Control the GPIO pin based on face detection
-    if authorized_face_detected:
-        cur.execute("SELECT secret_key FROM users WHERE name=?", (name,))
-        result = cur.fetchone()  # Fetch the first matching row
-
-        if result:
-            secret_key = result[0]  # Access the first column of the result
-            totp = pyotp.TOTP(secret_key)
-            user_2fa_input = input("Enter 2FA key generated on your device: ")
-            if (user_2fa_input == totp.now()):
-                print("success")
-                exit()
-            else:
-                print("invalid 2fa key")
-                exit()
-        else:
-            print("Name not found in the database.")
-        # output.on()  # Turn on Pin
-    # else:
-    # output.off()  # Turn off Pin
-    # continue
-
-    return frame
+    return name, frame
 
 
 def draw_results(frame):
@@ -134,32 +133,33 @@ def calculate_fps():
         start_time = time.time()
     return fps
 
+def run_facial_recognition():
+    while True:
+        # Capture a frame from camera
+        ret, frame = cam.read()
 
-while True:
-    # Capture a frame from camera
-    ret, frame = cam.read()
+        # Process the frame with the function
+        name, processed_frame = process_frame(frame)
 
-    # Process the frame with the function
-    processed_frame = process_frame(frame)
+        # Get the text and boxes to be drawn based on the processed frame
+        display_frame = draw_results(processed_frame)
 
-    # Get the text and boxes to be drawn based on the processed frame
-    display_frame = draw_results(processed_frame)
+        # Calculate and update FPS
+        current_fps = calculate_fps()
 
-    # Calculate and update FPS
-    current_fps = calculate_fps()
+        # Attach FPS counter to the text and boxes
+        cv2.putText(display_frame, f"FPS: {current_fps:.1f}", (display_frame.shape[1] - 150, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-    # Attach FPS counter to the text and boxes
-    cv2.putText(display_frame, f"FPS: {current_fps:.1f}", (display_frame.shape[1] - 150, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # Display everything over the video feed.
+        cv2.imshow('Video', display_frame)
 
-    # Display everything over the video feed.
-    cv2.imshow('Video', display_frame)
+        # Break the loop and stop the script if 'q' is pressed
+        if cv2.waitKey(1) == ord("q") or authorized_face_detected:
+            break
 
-    # Break the loop and stop the script if 'q' is pressed
-    if cv2.waitKey(1) == ord("q"):
-        break
-
-# By breaking the loop we run this code here which closes everything
-cam.release()
-cv2.destroyAllWindows()
-# output.off()  # Make sure to turn off the GPIO pin when exiting
+    # By breaking the loop we run this code here which closes everything
+    cam.release()
+    cv2.destroyAllWindows()
+    return name, authorized_face_detected
+    # output.off()  # Make sure to turn off the GPIO pin when exiting
