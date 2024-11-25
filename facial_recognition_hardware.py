@@ -83,13 +83,13 @@ def process_frame(frame):
         if result:
             secret_key = result[0]  # Access the first column of the result
             totp = pyotp.TOTP(secret_key)
-            user_2fa_input = input("Enter 2FA key generated on your device: ")
-            if (user_2fa_input == totp.now()):
-                print("success")
-                exit()
-            else:
-                print("invalid 2fa key")
-                exit()
+            #user_2fa_input = input("Enter 2FA key generated on your device: ")
+            #if (user_2fa_input == totp.now()):
+                #print("success")
+                #exit()
+            #else:
+                #print("invalid 2fa key")
+                #exit()
         else:
             print("Name not found in the database.")
         # output.on()  # Turn on Pin
