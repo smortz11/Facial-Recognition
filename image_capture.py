@@ -3,17 +3,18 @@ import os
 from datetime import datetime
 import sqlite3
 import pyotp
+import pyqrcode
 import model_training
 
 # Change this to the name of the person you're photographing
 PERSON_NAME = input("Please enter the name of the user you would like to add: ")
 
-def create_folder(name):
-    dataset_folder = "dataset"
-    if not os.path.exists(dataset_folder):
-        os.makedirs(dataset_folder)
+def create_folder(folder, name):
+
+    if not os.path.exists(folder):
+        os.makedirs(folder)
     
-    person_folder = os.path.join(dataset_folder, name)
+    person_folder = os.path.join(folder, name)
     if not os.path.exists(person_folder):
         os.makedirs(person_folder)
     return person_folder
@@ -30,7 +31,7 @@ def delete_folder(name):
 
 def capture_photos(name):
     space_count = 0
-    folder = create_folder(name)
+    folder = create_folder("dataset",name)
     
     # Initialize the camera
     cam = cv2.VideoCapture(0)
@@ -66,6 +67,20 @@ def capture_photos(name):
         con = sqlite3.connect("Blackout.db")
         cur = con.cursor()
         secret_key = pyotp.random_base32()
+
+        email = input("Please enter your email address: ")
+
+        url_qr = pyotp.totp.TOTP(secret_key).provisioning_uri(email, issuer_name="Facial Recognition")
+
+        otp_folder = create_folder("OTP", name)
+        person_qr = os.path.join(otp_folder, "OTP.svg")
+        if not os.path.exists(person_qr):
+            url = pyqrcode.create(url_qr)
+
+        # saves .svg image to working directory
+        # dont uncomment, just use screenshot in the directory
+
+        url.svg(person_qr, scale=8)
 
         # Use parameterized queries to insert the data
         cur.execute("INSERT INTO users (name, secret_key) VALUES (?, ?)", (name, secret_key))
