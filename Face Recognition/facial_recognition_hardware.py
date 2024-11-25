@@ -32,7 +32,7 @@ start_time = time.time()
 fps = 0
 
 # List of names that will trigger the GPIO pin
-authorized_names = ["Andrew"]  # Replace with names you wish to authorise THIS IS CASE-SENSITIVE
+authorized_names = ["Andrew", "Jay"]  # Replace with names you wish to authorise THIS IS CASE-SENSITIVE
 
 def process_frame(frame):
     global face_locations, face_encodings, face_names
@@ -66,20 +66,20 @@ def process_frame(frame):
         face_names.append(name)
     
     # Control the GPIO pin based on face detection
-    if authorized_face_detected:
-        user_2fa_input = input("Enter 2FA key generated on your device: ")
-        if (user_2fa_input == totp.now()):
-            print("success")
-            exit()
-        else:
-            print("invalid 2fa key")
-            exit()
+    #if authorized_face_detected:
+        #user_2fa_input = input("Enter 2FA key generated on your device: ")
+        #if (user_2fa_input == totp.now()):
+            #print("success")
+            #exit()
+        #else:
+            #print("invalid 2fa key")
+            #exit()
         #output.on()  # Turn on Pin
     #else:
         #output.off()  # Turn off Pin
         #continue
     
-    return frame
+    return "", frame
 
 
 def draw_results(frame):
@@ -115,31 +115,32 @@ def calculate_fps():
         start_time = time.time()
     return fps
 
-while True:
-    # Capture a frame from camera
-    ret, frame = cam.read()
-    
-    # Process the frame with the function
-    processed_frame = process_frame(frame)
-    
-    # Get the text and boxes to be drawn based on the processed frame
-    display_frame = draw_results(processed_frame)
-    
-    # Calculate and update FPS
-    current_fps = calculate_fps()
-    
-    # Attach FPS counter to the text and boxes
-    cv2.putText(display_frame, f"FPS: {current_fps:.1f}", (display_frame.shape[1] - 150, 30), 
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    
-    # Display everything over the video feed.
-    cv2.imshow('Video', display_frame)
-    
-    # Break the loop and stop the script if 'q' is pressed
-    if cv2.waitKey(1) == ord("q"):
-        break
+def run():
+    while True:
+        # Capture a frame from camera
+        ret, frame = cam.read()
 
-# By breaking the loop we run this code here which closes everything
-cam.release()
-cv2.destroyAllWindows()
-#output.off()  # Make sure to turn off the GPIO pin when exiting
+        # Process the frame with the function
+        name, processed_frame = process_frame(frame)
+
+        # Get the text and boxes to be drawn based on the processed frame
+        display_frame = draw_results(processed_frame)
+
+        # Calculate and update FPS
+        current_fps = calculate_fps()
+
+        # Attach FPS counter to the text and boxes
+        cv2.putText(display_frame, f"FPS: {current_fps:.1f}", (display_frame.shape[1] - 150, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+        # Display everything over the video feed.
+        cv2.imshow('Video', display_frame)
+
+        # Break the loop and stop the script if 'q' is pressed
+        if cv2.waitKey(1) == ord("q") or name != "":
+            break
+
+    # By breaking the loop we run this code here which closes everything
+    cam.release()
+    cv2.destroyAllWindows()
+    #output.off()  # Make sure to turn off the GPIO pin when exiting
