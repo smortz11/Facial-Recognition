@@ -16,9 +16,11 @@ def show_home_gui(name):
     def add_new_user():
         def submit_name():
             PERSON_NAME = name_entry.get()  # Get the entered name
+            PERSON_EMAIL = email_entry.get()
             print(PERSON_NAME)
+            print(PERSON_EMAIL)
             name_window.destroy()  # Close the pop-up window
-            ic.capture_photos(PERSON_NAME)  # Call capture_photos with the entered name
+            ic.capture_photos(PERSON_NAME, PERSON_EMAIL)  # Call capture_photos with the entered name
             mt.train_model()  # Train the model after capturing photos
 
         name_window = tk.Toplevel(home)
@@ -27,7 +29,7 @@ def show_home_gui(name):
         # Center the window
         screen_width = name_window.winfo_screenwidth()
         screen_height = name_window.winfo_screenheight()
-        window_width, window_height = 300, 150
+        window_width, window_height = 300, 300
         x_coord = (screen_width // 2) - (window_width // 2)
         y_coord = (screen_height // 2) - (window_height // 2)
         name_window.geometry(f"{window_width}x{window_height}+{x_coord}+{y_coord}")
@@ -35,17 +37,22 @@ def show_home_gui(name):
         name_window.focus_force()
 
         tk.Label(name_window, text="Enter the name of the new user:", font=("Helvetica", 12)).pack(pady=10)
-
         name_entry = tk.Entry(name_window, width=30)
         name_entry.pack(pady=10)
+
+        tk.Label(name_window, text="Enter the email of the new user:", font=("Helvetica", 12)).pack(pady=10)
+        email_entry = tk.Entry(name_window, width=30)
+        email_entry.pack(pady=10)
 
         submit_button = tk.Button(name_window, text="Submit", command=lambda:[submit_name(),home.focus_force()])
         submit_button.pack(pady=10)
 
     def unlock():
+        #ADD CODE TO UNLOCK THE LOCK HERE
         messagebox.showinfo("Unlock", "Unlock button clicked!")
 
     def lock():
+        # ADD CODE TO LOCK THE LOCK HERE
         messagebox.showinfo("Lock", "Lock button clicked!")
 
     home = tk.Tk()
@@ -149,4 +156,4 @@ def show_welcome_gui():
     root.mainloop()
 
 # when final change to show_welcome_gui()
-show_home_gui("Jay")
+show_welcome_gui()

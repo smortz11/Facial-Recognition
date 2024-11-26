@@ -24,7 +24,7 @@ def delete_folder(name):
     if os.path.exists(person_folder):
         os.rmdir(person_folder)
 
-def capture_photos(name):
+def capture_photos(name, email):
     space_count = 0
     folder = create_folder("dataset",name)
     
@@ -67,8 +67,6 @@ def capture_photos(name):
 
         if not os.path.exists(person_qr):
             secret_key = pyotp.random_base32()
-
-            email = input("Please enter your email address: ")
 
             url_qr = pyotp.totp.TOTP(secret_key).provisioning_uri(email, issuer_name="Facial Recognition")
             url = pyqrcode.create(url_qr)
