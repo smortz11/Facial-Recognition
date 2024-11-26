@@ -1,3 +1,5 @@
+#DONT NEED THIS FILE ANYMORE
+
 import pyotp
 import time
 import pyqrcode

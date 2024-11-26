@@ -14,9 +14,33 @@ def validate_user(name, otp):
 
 def show_home_gui(name):
     def add_new_user():
-        PERSON_NAME = input("Please enter the name of the user you would like to add: ")
-        ic.capture_photos(PERSON_NAME)
-        mt.train_model()
+        def submit_name():
+            PERSON_NAME = name_entry.get()  # Get the entered name
+            print(PERSON_NAME)
+            name_window.destroy()  # Close the pop-up window
+            ic.capture_photos(PERSON_NAME)  # Call capture_photos with the entered name
+            mt.train_model()  # Train the model after capturing photos
+
+        name_window = tk.Toplevel(home)
+        name_window.title("Add New User")
+
+        # Center the window
+        screen_width = name_window.winfo_screenwidth()
+        screen_height = name_window.winfo_screenheight()
+        window_width, window_height = 300, 150
+        x_coord = (screen_width // 2) - (window_width // 2)
+        y_coord = (screen_height // 2) - (window_height // 2)
+        name_window.geometry(f"{window_width}x{window_height}+{x_coord}+{y_coord}")
+        name_window.attributes('-topmost', True)
+        name_window.focus_force()
+
+        tk.Label(name_window, text="Enter the name of the new user:", font=("Helvetica", 12)).pack(pady=10)
+
+        name_entry = tk.Entry(name_window, width=30)
+        name_entry.pack(pady=10)
+
+        submit_button = tk.Button(name_window, text="Submit", command=lambda:[submit_name(),home.focus_force()])
+        submit_button.pack(pady=10)
 
     def unlock():
         messagebox.showinfo("Unlock", "Unlock button clicked!")
@@ -36,7 +60,6 @@ def show_home_gui(name):
     home.geometry(f"{window_width}x{window_height}+{x_coord}+{y_coord}")
 
     # Make the window take focus
-    home.attributes('-topmost', True)
     home.focus_force()
 
     # Create the welcome screen
@@ -125,4 +148,5 @@ def show_welcome_gui():
     # Run the application
     root.mainloop()
 
+# when final change to show_welcome_gui()
 show_home_gui("Jay")

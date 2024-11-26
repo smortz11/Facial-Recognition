@@ -6,7 +6,6 @@ import pyotp
 import pyqrcode
 
 def create_folder(folder, name):
-
     if not os.path.exists(folder):
         os.makedirs(folder)
     
