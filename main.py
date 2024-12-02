@@ -106,6 +106,8 @@ def show_textfield_gui(name):
         # Create a new Tkinter window for the text field
         textfield_window = tk.Tk()
         textfield_window.title(f"Hello {name}. Enter The OTP:")
+        textfield_window.attributes('-topmost', True)
+        textfield_window.focus_force()
 
         # Center the window
         screen_width = textfield_window.winfo_screenwidth()
@@ -126,6 +128,7 @@ def show_textfield_gui(name):
 
         # Keep the window running
         textfield_window.mainloop()
+        textfield_window.protocol(" WM_DELETE_WINDO W", exit())
 
 
 def show_welcome_gui():
