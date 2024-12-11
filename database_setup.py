@@ -7,10 +7,11 @@ def add_new_user():
     def submit_name():
         PERSON_NAME = name_entry.get()  # Get the entered name
         PERSON_EMAIL = email_entry.get()
+        PERSON_ROLE = "Admin"
         print(PERSON_NAME)
         print(PERSON_EMAIL)
         name_window.destroy()  # Close the pop-up window
-        ic.capture_photos(PERSON_NAME, PERSON_EMAIL)  # Call capture_photos with the entered name
+        ic.capture_photos(PERSON_NAME, PERSON_EMAIL, PERSON_ROLE)  # Call capture_photos with the entered name
         mt.train_model()  # Train the model after capturing photos
 
     name_window = tk.Tk()
@@ -40,9 +41,10 @@ def add_new_user():
     name_window.mainloop()
 
 con = sqlite3.connect("Blackout.db")
+
 cur = con.cursor()
 
-cur.execute("CREATE TABLE users(name, secret_key)")
+cur.execute("CREATE TABLE users(name,role, secret_key)")
 
 cur.execute("CREATE TABLE data_log(name, timestamp)")
 

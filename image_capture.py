@@ -24,7 +24,7 @@ def delete_folder(name):
     if os.path.exists(person_folder):
         os.rmdir(person_folder)
 
-def capture_photos(name, email):
+def capture_photos(name, email, role):
     space_count = 0
     folder = create_folder("dataset",name)
     
@@ -74,7 +74,7 @@ def capture_photos(name, email):
 
 
         # Use parameterized queries to insert the data
-        cur.execute("INSERT INTO users (name, secret_key) VALUES (?, ?)", (name, secret_key))
+        cur.execute("INSERT INTO users (name,role, secret_key) VALUES (?, ?, ?)", (name, role, secret_key))
         con.commit()  # Save the changes
         con.close()  # Close the connection
 

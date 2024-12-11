@@ -45,16 +45,17 @@ def close_connection():
     con.close()
 
 def check_user_otp(name, otp):
-    cur.execute("SELECT secret_key FROM users WHERE name=?", (name,))
+    cur.execute("SELECT role,secret_key FROM users WHERE name=?", (name,))
     result = cur.fetchone()  # Fetch the first matching row
 
     if result:
-        secret_key = result[0]  # Access the first column of the result
+        role = result[0]
+        secret_key = result[1]  # Access the first column of the result
         totp = pyotp.TOTP(secret_key)
         if (otp == totp.now()):
-            return True
+            return True, role
         else:
-            return False
+            return False, role
     else:
         print("Name not found in the database.")
 
