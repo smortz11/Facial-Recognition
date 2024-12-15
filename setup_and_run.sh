@@ -35,7 +35,7 @@ source face_rec/bin/activate
 # Step 3: Update and upgrade the system
 echo "Updating and upgrading the system..."
 if [ "$(uname)" == "Linux" ]; then
-    sudo apt update && sudo apt full-upgrade -y || { echo "Failed to update and upgrade system."; exit 1; }
+    sudo apt update || { echo "Failed to update and upgrade system."; exit 1; }
 elif [ "$(uname)" == "Darwin" ]; then
     echo "Updating system using Homebrew on MacOS (not necessary)."
 else
