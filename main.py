@@ -108,7 +108,7 @@ def show_home_gui(name, role):
         print(f"PDF has been saved to {output_path}")
 
     #PUT THE LOG DATA HERE
-    conn = sqlite3.connect('blackout.db')
+    conn = sqlite3.connect('Blackout.db')
     cur = conn.cursor()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cur.execute("INSERT INTO data_log (name, timestamp) VALUES (?, ?)", (name, timestamp))
