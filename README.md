@@ -19,40 +19,23 @@ This project implements a facial recognition-based two-factor authentication (2F
 ## Software Requirements
 - Raspbian OS (latest version recommended)
 - Python 3
-- OpenCV
-- *FILL THIS OUT MORE, IDK RN*
 
-## Installation THIS IS WRONG PROBABLY, JUST GETTING A BASE DOWN
-1. **Update and Install Dependencies**:
-    ```sh
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install python3 python3-pip python3-opencv libatlas-base-dev
-    pip3 install numpy dlib twilio
-    ```
-
-2. **Enable Camera on Raspberry Pi**:
+## Installation
+1. **Enable Camera on Raspberry Pi**:
     ```sh
     sudo raspi-config
     ```
     - Navigate to *Interfacing Options > Camera* and enable it.
     - Reboot the Raspberry Pi.
 
-3. **Clone the Repository**:
+2. **Install and Setup (Linux & MacOS)**:
     ```sh
-    git clone https://github.com/your-repo/facial-recognition-2fa.git
-    cd facial-recognition-2fa
+    git clone https://github.com/smortz11/Facial-Recognition.git && cd facial-recognition-project && chmod +x setup_and_run.sh && ./setup_and_run.sh
     ```
 
-4. **Train the Facial Recognition Model**:
-    - Collect images of authorized users.
-    - Run the training script:
+3. **Install and Setup (Windows)**:
     ```sh
-    python3 train_model.py
-    ```
-
-5. **Run the System**:
-    ```sh
-    python3 main.py
+    git clone https://github.com/smortz11/Facial-Recognition.git cd facial-recognition-project && setup_and_run.bat
     ```
 
 ## Usage
@@ -66,7 +49,6 @@ This project implements a facial recognition-based two-factor authentication (2F
 - Infrared cameras
 - QR-based OTP to rid of keyboard.
 - An anomaly detection system for spoofing attempts.
-
 
 ## License
 This project is licensed under the MIT License.
